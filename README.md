@@ -1,39 +1,53 @@
-# diablo-sdk-v1
+<p align="center"><strong>DIABLO SDK</strong></p>
+<p align="center"><a href="https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/License-LGPL%203.0-orange"/></a>
+<img alt="language" src="https://img.shields.io/badge/language-c++-red"/>
+<img alt="platform" src="https://img.shields.io/badge/platform-raspberrypi-l"/>
+</p>
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
-
-#### 软件架构
-软件架构说明
-
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+<p align="center">
+    语言：<a href="README.en.md"><strong>English</strong></a> / <strong>中文</strong>
+</p>
 
 
-#### 特技
+​	基于树莓派串口通信的 `DIABLO` 机器人二次开发控制接口。您可以通过 SDK 对机器人进行精准的定量控制，或者使用网络遥控的方式对机器人进行远程控制。
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+---
+
+
+
+# Platform Support 支持平台
+
+* Raspberry Pi 4
+
+  
+
+## Dependencies 环境依赖
+
+- [ubuntu mate 20.04](https://ubuntu-mate.org/download/armhf/focal/thanks/?method=torrent)
+
+- [ros noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
+
+- [wiringPi](http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/)
+
+  
+
+## Quick Start 快速开始
+
+1. 创建ros工程文件夹
+
+```bash
+#make sure you have build all dependence.
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+catkin_init_workspace
+
+#clone API source code
+git clone https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1.git
+
+cd ~/catkin_ws
+catkin_make
+```
+
+## More Information 更多信息
+
+- [中文手册](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/pages/Installation/Installing-SDK-On-Pi.html)
