@@ -10,7 +10,7 @@ import termios
 
 import threading
 
-keyQuee = []
+keyQueue = []
 old_setting = termios.tcgetattr(sys.stdin)
 
 def readchar():
@@ -24,10 +24,10 @@ def readchar():
     return ch
 
 def getKeyBoard():
-    global keyQuee
+    global keyQueue
     while True:
         c = readchar()
-        keyQuee.append(c)
+        keyQueue.append(c)
 
 t1 =threading.Thread(target=getKeyBoard)
 t1.setDaemon(True)
@@ -37,8 +37,8 @@ def main():
     rospy.init_node('dj_teleop')
     keypub = rospy.Publisher('/DJ_teleop', String, queue_size = 2)
     while True:
-        if len(keyQuee) > 0:
-            key = keyQuee.pop(0)
+        if len(keyQueue) > 0:
+            key = keyQueue.pop(0)
         else:
             key = " "
         if key == '1':
