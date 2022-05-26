@@ -41,7 +41,7 @@ def main():
             key = keyQuee.pop(0)
         else:
             key = " "
-        if key == '`':
+        if key == '1':
             break
         keypub.publish(key)
         time.sleep(0.04)
