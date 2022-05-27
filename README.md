@@ -50,4 +50,4 @@ catkin_make
 
 ## More Information 更多信息
 
-- [中文手册](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/pages/Installation/Installing-SDK-On-Pi.html)
+
