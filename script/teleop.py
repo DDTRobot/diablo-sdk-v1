@@ -36,6 +36,7 @@ t1.start()
 def main():
     rospy.init_node('dj_teleop')
     keypub = rospy.Publisher('/DJ_teleop', String, queue_size = 2)
+    print("dj teleop start!")
     while True:
         if len(keyQueue) > 0:
             key = keyQueue.pop(0)
