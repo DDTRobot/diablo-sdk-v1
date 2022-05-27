@@ -89,9 +89,6 @@ void teleop_ctrl(const std_msgs::String::ConstPtr& msg)
             case 'p':
                 pMovementCtrl->ctrl_data.pitch = 0.5f;                  // pos & angular_vel ctrl
                 break;
-            case 'b':
-                pMovementCtrl->EmergencyBrake();                        // Emergency Brake
-                return;
             default:
                 break;
         }
