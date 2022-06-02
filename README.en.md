@@ -17,7 +17,7 @@
 
 # Platform Support 
 
-* Raspberry Pi 4
+* Raspberry Pi 
 
   
 
@@ -34,7 +34,7 @@
 ## Quick Start 
 
 1. Build ros workspace.
- 
+
 ```bash
 #make sure you have build all dependence.
 mkdir -p ~/catkin_ws/src
@@ -48,4 +48,16 @@ cd ~/catkin_ws
 catkin_make
 ```
 
+
+
+## Example 
+
+- [Virtual RC Ctrl](https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1/tree/master/example/virtual_rc)
+- [Movement Ctrl](https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1/tree/master/example/movement_ctrl)
+- [Read Robot Status](https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1/tree/master/example/robot_status)
+
+
+
 ## More Information 
+
+- [Chinese Docs](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/)
