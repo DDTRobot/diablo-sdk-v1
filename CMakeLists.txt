@@ -114,6 +114,12 @@ if (WITH_ROS)
     ${CMAKE_CURRENT_SOURCE_DIR}/example/movement_ctrl/main.cpp)
     add_dependencies(movement_ctrl_example diablo_sdk_generate_messages_cpp)
     add_compile_options(-l sqlite3)
+
+    add_executable(robot_status_example ${OSDK_LIB_SRCS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/example/robot_status/main.cpp)
+    add_dependencies(robot_status_example diablo_sdk_generate_messages_cpp)
+    add_compile_options(-l sqlite3)
+
     
 endif (WITH_ROS)
 
