@@ -5,7 +5,7 @@
 #ifndef _ONBOARD_SDK_UART_PROTOCOL_H_
 #define _ONBOARD_SDK_UART_PROTOCOL_H_
 
-//VERSION: 0.0
+//VERSION: 1.0
 #define OSDK_HEADER                                      0xAA
 #define OSDK_VERSION                                       1U
 
