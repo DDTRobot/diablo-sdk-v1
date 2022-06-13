@@ -42,7 +42,7 @@ cd ~/catkin_ws/src
 catkin_init_workspace
 
 #clone API source code
-git clone https://github.com/Direcrt-Drive-Technology/diablo-sdk-v1.git
+git clone https://github.com/DDTRobot/diablo-sdk-v1.git
 
 cd ~/catkin_ws
 catkin_make
