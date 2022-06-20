@@ -17,7 +17,7 @@
 
 # Platform Support 支持平台
 
-* Raspberry Pi 
+* Linux 
 
   
 
