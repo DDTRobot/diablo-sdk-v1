@@ -17,7 +17,7 @@
 
 # Platform Support 
 
-* Raspberry Pi 
+* Linux
 
   
 
@@ -27,9 +27,7 @@
 
 - [ros noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
 
-- [wiringPi](http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/)
 
-  
 
 ## Quick Start 
 
@@ -58,6 +56,6 @@ catkin_make
 
 
 
-## More Information 
+<!-- ## More Information 
 
-- [Chinese Docs](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/)
+- [Chinese Docs](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/) -->
