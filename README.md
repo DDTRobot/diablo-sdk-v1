@@ -27,9 +27,7 @@
 
 - [ros noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
 
-- [wiringPi](http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/)
 
-  
 
 ## Quick Start 快速开始
 
@@ -58,6 +56,6 @@ catkin_make
 
 
 
-## More Information 更多信息
+<!-- ## More Information 更多信息
 
-- [中文文档](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/)
+- [中文文档](https://diablo-sdk-docs.readthedocs.io/zh_CN/latest/) -->
