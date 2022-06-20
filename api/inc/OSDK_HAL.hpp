@@ -4,20 +4,20 @@
  */
 #pragma once
 
-#include <cstring>
+
 #include <list>
-#include <pthread.h>
+#include <mutex>
+#include <thread>
+#include <cstring>
+#include <unistd.h>
 #include <iostream>
+#include <pthread.h>
+#include <functional>
+#include <condition_variable>
 
-#if defined (_WITH_PI)
-    #include <wiringPi.h>
-    #include <wiringSerial.h>
-#endif
-
+#include "SerialPort.hpp"
 #include "Onboard_SDK_Uart_Protocol.h"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
+
 
 namespace DIABLO{
 namespace OSDK{
@@ -118,7 +118,7 @@ public:
      * @note        NON-API FUNCTION
      * @return      pointer to data packet, NULL if no packet received in 100ms
      */
-    void* serialWaitRXDataS(boost::unique_lock<boost::mutex>& lock, 
+    void* serialWaitRXDataS(std::unique_lock<std::mutex>& lock, 
         const uint8_t cmd_set, const uint8_t cmd_id);
 
     /**
@@ -127,7 +127,7 @@ public:
      */
     double getTimeStamp(void)
     {
-        boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start_tp;
+        std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_tp;
         return sec.count();
     }
 
@@ -149,14 +149,14 @@ protected:
     }
 
 public:
-    boost::mutex                     serial_rx_mtx;
-    boost::mutex                     serial_tx_mtx;
-    boost::mutex                  serial_prerx_mtx;
+    std::mutex                     serial_rx_mtx;
+    std::mutex                     serial_tx_mtx;
+    std::mutex                  serial_prerx_mtx;
 
 protected:
     HAL():
         serial_tx_thd(NULL), serial_rx_thd(NULL),
-        start_tp(boost::chrono::system_clock::now()), VRC_Data_packet_num(0), VRC_REQ_packet_num(0)
+        start_tp(std::chrono::system_clock::now()), VRC_Data_packet_num(0), VRC_REQ_packet_num(0)
         {}
 
     ~HAL()
@@ -164,14 +164,11 @@ protected:
         if(serial_tx_thd)
         {
             pthread_cancel(serial_tx_thd->native_handle());
-            delete serial_tx_thd;
-            serial_tx_thd = NULL;
         }
         if(serial_rx_thd)
         {
             pthread_cancel(serial_rx_thd->native_handle());
-            delete serial_rx_thd;
-            serial_rx_thd = NULL;
+
         }
     }
 
@@ -187,15 +184,15 @@ protected:
 protected:
 //transmission handling
     bool                            serial_tx_idle;
-    boost::condition_variable       serial_tx_cond;
+    std::condition_variable       serial_tx_cond;
     double                      serial_tx_duration;
-    boost::thread*                   serial_tx_thd;
+    std::thread*                   serial_tx_thd;
 
 //receive handling
-    boost::thread*                   serial_rx_thd;
+    std::thread*                   serial_rx_thd;
     
-    boost::condition_variable   serial_rx_ack_cond;
-    boost::condition_variable  serial_rx_data_cond;
+    std::condition_variable   serial_rx_ack_cond;
+    std::condition_variable  serial_rx_data_cond;
 
     /** 
      * @brief serial transmission multiplexing thread function
@@ -204,7 +201,7 @@ protected:
     void TXMonitorProcess(void);
 
 protected:
-    boost::chrono::system_clock::time_point start_tp;
+    std::chrono::system_clock::time_point start_tp;
 
 protected:
     uint16_t VRC_Data_packet_num;
@@ -212,14 +209,13 @@ protected:
 };
 
 
-#if defined (_WITH_PI)
 /**
  * @brief HAL class for Raspiberry Pi
  */
 class HAL_Pi: public HAL
 {
 public:
-    HAL_Pi():fd(0){}
+    HAL_Pi(){}
 
     /**
      * @brief initialize serial port for raspberry pi
@@ -230,46 +226,11 @@ public:
      *         2 start heartbeat error \n
      *         3 initialization port fail \n
      */
-    uint8_t init(const std::string dev = "/dev/ttyAMA0", const int baud = 460800)
-    {
-        if (wiringPiSetup () == -1)
-        {
-            std::cerr<<"Unable to start wiringPi: %s\n";
-            return 1;
-        } 
-        wiringPiSetupGpio();
-
-        heartbeat = new boost::thread(std::bind(&HAL_Pi::HeartBeatProcess, this));
-        if(heartbeat == NULL)
-        {
-            std::cerr<<"Unable to start heartbeat"<<std::endl;
-            return 2;
-        }
-
-        fd = serialOpen (dev.c_str(), baud);
-        serial_br = baud;
-        if(fd < 0)
-        {
-            std::cerr<<"Serial Port Initialization Failed"<<std::endl;
-            return 3;
-        }
-
-        serialFlush(fd);
-        serial_tx_duration = 0;
-        serial_tx_idle = true;
-        serial_tx_thd = new boost::thread(std::bind(&HAL_Pi::TXMonitorProcess, this));
-        serial_rx_thd = new boost::thread(std::bind(&HAL_Pi::RXMonitorProcess, this)); //TODO CPU load too heavy, modify this
-        
-        usleep(10000); //ensure stability
-        std::cout<<"Serial port \""<<dev<<"\" connected"<<std::endl;   
-
-        rx_data = (void*)(serial_rxbuf + 2 + sizeof(OSDK_Uart_Header_t));
-        return 0;
-    }
+    uint8_t init(const std::string dev = "/dev/ttyAMA0", const int baud = 460800);
 
     ~HAL_Pi()
     {
-        serialClose(fd);
+        mySerial.Close();
     }
 
     /**
@@ -287,14 +248,11 @@ public:
      * @note  NON-API FUNCTION
      */
     void RXMonitorProcess(void);
-    void HeartBeatProcess(void);
-private:
-    int                    fd;
-    boost::thread*  heartbeat;
 
-    static const int heartbeat_pin = 13;
+private:
+    VulcanSerial::SerialPort      mySerial;
+
 };
-#endif
 
 }
 }

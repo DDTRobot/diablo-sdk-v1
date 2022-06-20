@@ -11,12 +11,15 @@
 #include <vector>
 #include <functional>
 #include <math.h>
+#include <mutex>
+#include <thread>
+#include <chrono>
 
 #include "Onboard_SDK_Uart_Protocol.h"
 #include "OSDK_DDJ_M15.hpp"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
+
+
+
 
 namespace DIABLO{
 namespace OSDK{
@@ -44,12 +47,10 @@ public:
         if(thd)
         {
             pthread_cancel(thd->native_handle());
-            delete thd;
         }
         if(cnt_thd)
         {
             pthread_cancel(cnt_thd->native_handle());
-            delete cnt_thd;
         }
     }
 
@@ -113,7 +114,7 @@ public:
      */
     void setNewcomeFlag(uint8_t datacome)
     {
-        boost::unique_lock<boost::mutex>(newcome_mtx);
+        std::unique_lock<std::mutex> lock(newcome_mtx);
         newcome |= datacome;
     }
 
@@ -123,7 +124,7 @@ public:
      */
     void eraseNewcomeFlag(uint8_t datasend)
     {
-        boost::unique_lock<boost::mutex>(newcome_mtx);
+        std::unique_lock<std::mutex> lock(newcome_mtx);
         newcome &= datasend;
     }
 
@@ -191,7 +192,7 @@ public:
     Leg_Motors                                    motors;       //10 uint8 * 6、
 
     uint8_t                                         newcome;
-    boost::mutex                                newcome_mtx;
+    std::mutex                                newcome_mtx;
 
     uint8_t                                           id;
 
@@ -200,8 +201,8 @@ private:
 
 private:
     Vehicle*        vehicle;
-    boost::thread*      thd;
-    boost::thread*  cnt_thd;
+    std::thread*      thd;
+    std::thread*  cnt_thd;
 
     bool          log_start;
     uint32_t       log_flag;

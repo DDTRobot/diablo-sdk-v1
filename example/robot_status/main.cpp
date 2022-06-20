@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
     
     vehicle.telemetry->configUpdate(); 
     
-    vehicle.telemetry->enableLog(DIABLO::OSDK::TOPIC_POWER);
+//    vehicle.telemetry->enableLog(DIABLO::OSDK::TOPIC_POWER);
 
     ros::Publisher ACCLPublisher = nh.advertise<diablo_sdk::OSDK_ACCL>("diablo_ros_ACCL_b", 10);
     ros::Publisher GYROPublisher = nh.advertise<diablo_sdk::OSDK_GYRO>("diablo_ros_GYRO_b", 10);

@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include "OSDK_Vehicle.hpp"
-
+#include <iostream>
 
 int dj_mode = 0;
 int height = 100;
@@ -86,14 +86,18 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "virtual_rc_example");
     ros::NodeHandle nh("~");
+	
+    printf("init ros ok.\n");
 
     DIABLO::OSDK::HAL_Pi Hal;
     if(Hal.init()) return -1;
 
+    printf("init hal ok.\n");
     DIABLO::OSDK::Vehicle vehicle(&Hal);                                  //Initialize Onboard SDK
     if(vehicle.init()) return -1;
 
 
+    printf("init vehicle ok.\n");
     vehicle.telemetry->activate();
     //vehicle.telemetry->configTopic(DIABLO::OSDK::TOPIC_STATUS, OSDK_PUSH_DATA_10Hz);
     //vehicle.telemetry->configTopic(DIABLO::OSDK::TOPIC_POWER, OSDK_PUSH_DATA_10Hz);

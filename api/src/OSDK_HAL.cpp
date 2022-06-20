@@ -1,11 +1,15 @@
 
+#include <stdio.h>
+#include <iostream>
+#include <string>
+
 #include "OSDK_HAL.hpp"
 #include "OSDK_Header.hpp"
 #include "OSDK_CRC.hpp"
 
+
+using namespace std;
 using namespace DIABLO::OSDK;
-using namespace boost;
-using namespace boost::chrono;
 
 void HAL::serialPackData(const OSDK_Uart_Header_t& header, 
         const uint8_t cmd_set, const uint8_t cmd_id, 
@@ -19,7 +23,7 @@ void HAL::serialPackData(const OSDK_Uart_Header_t& header,
     memcpy(serial_txbuf + OSDK_DATA_POS_OFFSET + data_len, &CRC16, 2);
 }
 
-void* HAL::serialWaitRXDataS(boost::unique_lock<boost::mutex>& lock, const uint8_t cmd_set, const uint8_t cmd_id)
+void* HAL::serialWaitRXDataS(std::unique_lock<std::mutex>& lock, const uint8_t cmd_set, const uint8_t cmd_id)
 {
     static const chrono::duration<int, milli> timeout(1000);
     if(!serial_rx_data_cond.wait_for(lock, timeout,
@@ -70,7 +74,7 @@ void HAL::TXMonitorProcess(void)
                 continue;
             }
         }
-        this_thread::sleep_for(boost::chrono::duration<double>(serial_tx_duration));
+        this_thread::sleep_for(std::chrono::duration<double>(serial_tx_duration));
         {
             unique_lock<mutex> lock(serial_tx_mtx);
             serial_tx_idle = true;
@@ -79,7 +83,29 @@ void HAL::TXMonitorProcess(void)
     }
 }
 
-#if defined (_WITH_PI)
+uint8_t HAL_Pi::init(const std::string dev, const int baud)
+{
+    mySerial.SetDevice(dev.c_str());
+    mySerial.SetBaudRate(VulcanSerial::BaudRate::B_460800);
+    mySerial.SetNumDataBits(VulcanSerial::NumDataBits::EIGHT);
+    mySerial.SetNumStopBits(VulcanSerial::NumStopBits::ONE);
+    serial_br = baud;
+    mySerial.Open();
+    
+    serial_tx_duration = 0;
+    serial_tx_idle = true;
+    serial_tx_thd = new std::thread(std::bind(&HAL_Pi::TXMonitorProcess, this));
+    serial_rx_thd = new std::thread(std::bind(&HAL_Pi::RXMonitorProcess, this)); //TODO CPU load too heavy, modify this
+    
+    usleep(10000); //ensure stability
+    std::cout<<"Serial port \""<<dev<<"\" connected"<<std::endl;   
+
+    rx_data = (void*)(serial_rxbuf + 2 + sizeof(OSDK_Uart_Header_t));
+    return 0;
+}
+    
+
+
 uint8_t HAL_Pi::serialSend(const OSDK_Uart_Header_t& header, 
         const uint8_t cmd_set, const uint8_t cmd_id, 
         const void* data, const uint32_t data_len)
@@ -100,9 +126,9 @@ uint8_t HAL_Pi::serialSend(const OSDK_Uart_Header_t& header,
     serial_tx_idle = false;
     serial_tx_cond.notify_all();
 
-    for(uint8_t i = 0; i < size; i++)   
-        serialPutchar(fd, serial_txbuf[i]);
-         
+    for(uint8_t i = 0; i < size; i++) 
+        mySerial.WriteChar(serial_txbuf[i]);
+    
     return 0;
 }
 
@@ -116,20 +142,20 @@ void HAL_Pi::RXMonitorProcess(void)
         int start = -1;
         while(start != OSDK_HEADER)
         {
-            start = serialGetchar(this->fd);
+            start = mySerial.ReadChar();
             if(start == -1) //no data received at all
                 std::cerr<<"Serial receive timeout occured 1!"<<std::endl;
         }
         
         //wait for receiving a complete header
         usleep(byte_micro * sizeof(OSDK_Uart_Header_t));
-        while(serialDataAvail(fd) < sizeof(OSDK_Uart_Header_t) - 1) usleep(byte_micro);
+        while(mySerial.Available() < sizeof(OSDK_Uart_Header_t) - 1) usleep(byte_micro);
         
         header.data.SOF = start;
         uint16_t len, data_len;
         for(uint16_t i = 1; i < sizeof(OSDK_Uart_Header_t); i++)
         {
-            int result = serialGetchar(this->fd);
+            int result = mySerial.ReadChar();
             if(result == -1)
             {
                 std::cerr<<"Serial receive timeout occured 2!"<<std::endl;
@@ -152,12 +178,12 @@ void HAL_Pi::RXMonitorProcess(void)
 
         //wait for receiving a complete frame
         usleep(byte_micro * data_len);
-        while(serialDataAvail(fd) < data_len) usleep(byte_micro);
+        while(mySerial.Available() < data_len) usleep(byte_micro);
 
         unique_lock<mutex> lock(serial_rx_mtx);
         for(uint16_t i = sizeof(OSDK_Uart_Header_t); i < len; i++)
         {
-            int result = serialGetchar(this->fd);
+            int result = mySerial.ReadChar();
             
             if(result == -1)
             {
@@ -185,22 +211,5 @@ void HAL_Pi::RXMonitorProcess(void)
     }
 }
 
-void HAL_Pi::HeartBeatProcess(void)
-{
-    pinMode(heartbeat_pin, OUTPUT);
-    digitalWrite(heartbeat_pin, HIGH);
 
-    this->start_tp = system_clock::now();
-    system_clock::time_point tp = start_tp + milliseconds(100);
-    while(true)
-    {
-        this_thread::sleep_until(tp);
-        digitalWrite(heartbeat_pin, LOW);
-        tp += milliseconds(100);
-        this_thread::sleep_until(tp);
-        digitalWrite(heartbeat_pin, HIGH);
-        tp += milliseconds(100);
-    }
-}
 
-#endif

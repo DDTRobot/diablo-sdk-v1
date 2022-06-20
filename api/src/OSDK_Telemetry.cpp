@@ -5,7 +5,6 @@
 
 
 using namespace DIABLO::OSDK;
-using namespace boost;
 
 Telemetry::Telemetry(Vehicle* vehicle): vehicle(vehicle)
 {
@@ -16,7 +15,7 @@ Telemetry::Telemetry(Vehicle* vehicle): vehicle(vehicle)
     bit_r[0] = 10;
     bit_r[5] = 1;
     memset(frequency_flag, OSDK_PUSH_DATA_NO_CHANGE, 7);
-    thd = new boost::thread(std::bind(&Telemetry::SerialHandle, this));
+    thd = new std::thread(std::bind(&Telemetry::SerialHandle, this));
 }
 
 uint8_t Telemetry::activate(void)
@@ -33,7 +32,7 @@ uint8_t Telemetry::activate(void)
     uint16_t ack = -1;
     vehicle->hal->serialSend_ack(header.data, ack, OSDK_INIT_SET, OSDK_ACTIVATION_ID, &key, 4);
     this->id = ack;
-    cnt_thd = new boost::thread(std::bind(&Telemetry::SDKConnectMonitor, this));
+    cnt_thd = new std::thread(std::bind(&Telemetry::SDKConnectMonitor, this));
     return 0;
 }
 
@@ -249,7 +248,7 @@ void Telemetry::SerialHandle(void)
     while(true)
     {
         //printf("%u\n",newcome);
-        boost::unique_lock<boost::mutex> lock(vehicle->hal->serial_rx_mtx);
+        std::unique_lock<std::mutex> lock(vehicle->hal->serial_rx_mtx);
         OSDK_Push_Data_Flag_t* flag = (OSDK_Push_Data_Flag_t*)(vehicle->hal->serialWaitRXDataS(lock, OSDK_DATA_SET, OSDK_PUSH_DATA_ID));
         if(flag == NULL)
         {

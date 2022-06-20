@@ -4,12 +4,13 @@
  */
 #pragma once
 
+#include <mutex>
+#include <chrono>
+#include <thread>
 #include <stdio.h>
 #include <iostream>
 #include <string.h>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/chrono.hpp>
+
 #include "Onboard_SDK_Uart_Protocol.h"
 
 namespace DIABLO{

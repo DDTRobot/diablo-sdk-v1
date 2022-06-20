@@ -7,8 +7,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <string.h>
-#include "Onboard_SDK_Uart_Protocol.h"
 #include "OSDK_CRC.hpp"
+#include "Onboard_SDK_Uart_Protocol.h"
+
 
 namespace DIABLO{
 namespace OSDK{
